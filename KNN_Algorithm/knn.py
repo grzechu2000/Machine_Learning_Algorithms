@@ -14,8 +14,6 @@ class KNearestNeighbors:
     @staticmethod
     def load_csv(csv_file: str) -> list:
         """ This method takes in a csv file with data, and converts it into a python list.
-
-
         :param csv_file: name of the csv file with data
         :return: dataset: formatted list of type list[list[str]]
         """
@@ -32,8 +30,6 @@ class KNearestNeighbors:
     def data_conversion(dataset: list) -> list:
         """ This method takes a formatted dataset from the load_csv method, and converts data of type
         string to data of type float and/or int.
-
-
         :param dataset: a formatted list
         :return: a formatted list
         """
@@ -53,7 +49,6 @@ class KNearestNeighbors:
     @staticmethod
     def calculate_distance(test_row: list, train_row: list) -> float:
         """ This method calculates the euclidean distance between data points
-
         :param test_row: test_data point of type list
         :param train_row: train_data point of type list
         :return: euclidean distance between data points in the n-th dimension
@@ -66,7 +61,6 @@ class KNearestNeighbors:
     def get_nearest_neighbor(self, test_row: list, train_set: list) -> list:
         """ This method calculates the nearest neighboring points from train_data to
         the test_data point
-
         :param test_row: test_data point of type list
         :param train_set: train data of type list
         :return: list of n nearest neighbors to the test_data point
@@ -84,7 +78,6 @@ class KNearestNeighbors:
     def predict_classification(self, test_row: list, train_set: list) -> int:
         """ This method predicts the class of the submitted test_data point according
         to it's nearest neighbors
-
         :param test_row: test_data point of type list
         :param train_set: train data of type list
         :return: prediction in int format in relation to different data classifications
@@ -100,7 +93,6 @@ class KNearestNeighbors:
 
     def k_nearest_neighbors(self, test_set, train_set):
         """ This method classifies test_data points according to the training_data
-
         :param test_set: test data of type list
         :param train_set: train data of type list
         :return: list of predicted classifications for submitted test_data points
@@ -113,19 +105,17 @@ class KNearestNeighbors:
     def knn(self):
         """"""
         test_result = self.k_nearest_neighbors(self.test_set, self.dataset)
-        for i in range(len(test_result)):
-            if test_result[i] == 0:
-                test_result[i] = "Iris-setosa"
-            elif test_result[i] == 1:
-                test_result[i] = "Iris-versicolor"
-            elif test_result[i] == 2:
-                test_result[i] = "Iris-virginica"
+        # for i in range(len(test_result)):
+        #     if test_result[i] == 0:
+        #         test_result[i] = "Iris-setosa"
+        #     elif test_result[i] == 1:
+        #         test_result[i] = "Iris-versicolor"
+        #     elif test_result[i] == 2:
+        #         test_result[i] = "Iris-virginica"
         return test_result
 
     def split_into_folds(self, n_folds: int) -> list:
         """ This method splits train data into folds, who then get passed on to the evaluation function
-
-
         :param n_folds: number of folds to split data into
         :return: list of folds
         """
@@ -141,8 +131,7 @@ class KNearestNeighbors:
         return dataset_split
 
     def evaluate_knn(self, n_folds: int):
-        """ This method evaluates the accuracy of the knn algorithm
-        """
+        """ This method evaluates the accuracy of the knn algorithm """
         folds = self.split_into_folds(n_folds)
         scores = list()
         for fold in folds:
@@ -158,7 +147,11 @@ class KNearestNeighbors:
             actual = [row[-1] for row in fold]
             accuracy = self.accuracy_score(actual, predicted)
             scores.append(accuracy)
-        return scores
+        mean_accuracy = 0.0
+        for score in scores:
+            mean_accuracy += score
+        mean_accuracy = mean_accuracy/len(scores)
+        return scores, mean_accuracy
 
     @staticmethod
     def accuracy_score(actual_class: list, predicted_class: list):
@@ -169,8 +162,15 @@ class KNearestNeighbors:
         return correct / float(len(actual_class)) * 100.0
 
 
-neural_network = KNearestNeighbors('iris_test.csv', 'iris.csv', n_neighbors=5)
-print(neural_network.knn())
-print(neural_network.evaluate_knn(5))
-# for i in range(1, 5):
-#     print("Accuracy score for ", i, " folds :", neural_network.evaluate_knn(i))
+
+
+for i in range(3, 9):
+    print(i)
+    neural_network = KNearestNeighbors('iris_test.csv', 'iris.csv', n_neighbors=i)
+    print(neural_network.knn())
+
+
+# print(neural_network.evaluate_knn(5))
+
+
+
