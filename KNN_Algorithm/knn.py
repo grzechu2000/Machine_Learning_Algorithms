@@ -162,8 +162,6 @@ class KNearestNeighbors:
         return correct / float(len(actual_class)) * 100.0
 
 
-
-
 for i in range(3, 9):
     print(i)
     neural_network = KNearestNeighbors('iris_test.csv', 'iris.csv', n_neighbors=i)

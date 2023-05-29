@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-df = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data', header=None)
+df = pd.read_csv('iris.data', header=None)
 
 
 class Perceptron:
@@ -52,6 +52,7 @@ class Perceptron:
         -1 otherwise
         """
         return np.where(self.activation_function(x) >= 0, 1, -1)
+
     @staticmethod
     def accuracy(predicted, actual):
         accuracy = 0
@@ -61,21 +62,46 @@ class Perceptron:
 
         return accuracy/float(len(actual)) * 100.0
 
+import csv
 # Data preprocessing
 df.columns = ['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm', 'Species']
-X_data = df.iloc[:150, [0, 1, 2, 3]].values
-y_data = df.iloc[:150, [4]].values
-y_data = np.where(y_data == 'Iris-versicolor', 1, -1)
+predict_list = []
+species_list = ['Iris-versicolor', 'Iris-setosa', 'Iris-virginica']
+x = np.arange(0.05, 0.95 + 0.05, 0.05)
+with open('data.csv', 'a+', newline='') as csvfile:
+    acc_score_species = []
+    for species in species_list:
+        print(species)
+        acc_score = []
+        for size in x:
+            print(size)
+            for i in range(0, 10):
+                X_data = df.iloc[:150, [0, 3]].values
+                y_data = df.iloc[:150, [4]].values
+                y_data = np.where(y_data == species, 1, -1)
+                X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=size, random_state=0)
+                neural_network = Perceptron(X_test, X_train, y_test, y_train, n_epochs=100, learning_rate=0.1)
+                neural_network.train()
+                predictions = neural_network.thresholding_function(X_test)
+                predict_list.append(neural_network.accuracy(predicted=predictions, actual=y_test))
+                del(X_data, y_data, X_train, X_test, y_train, y_test, neural_network, predictions)
+            acc_sum = 0
+            for i in range(0, len(predict_list)):
+                acc_sum += predict_list[i]
+            mean_acc = float(acc_sum / len(predict_list))
+            acc_score.append(mean_acc)
+            print("Mean accuracy score: ", mean_acc, "%")
+        acc_score_species.append(acc_score)
+        del acc_score
+    write = csv.writer(csvfile)
+    write.writerows(acc_score_species)
 
-X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.25, random_state=0)
-
-perceptron = Perceptron(X_test, X_train, y_test, y_train, n_epochs=100, learning_rate=0.01)
-perceptron.train()
-predictions = perceptron.thresholding_function(X_test)
-print("accuracy ", perceptron.accuracy(predictions, y_test), "%")
-
-plt.plot(range(1, len(perceptron.err) + 1), perceptron.err, marker='o')
-plt.xlabel('Epoch')
-plt.ylabel('Errors')
+for i in range(0, len(acc_score_species)):
+    plt.plot(x, acc_score_species[i], label=species_list[i])
+plt.title("Rosenblatt Accuracy - data vector len() = 2")
+plt.xlabel("Train - Test split")
+plt.ylabel("Accuracy score [%]")
+plt.grid()
+plt.legend(species_list)
 plt.show()
 
